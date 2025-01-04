@@ -1,10 +1,2 @@
 /.env
-/app.js
-/config
-/controller
-/middleware
-/model
 /node_modules
-/routes
-/uploads
-/utils

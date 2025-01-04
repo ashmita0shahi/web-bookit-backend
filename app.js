@@ -18,12 +18,8 @@ app.use(cors(corsOptions));
 
 // Routes
 app.use("/api/users", require("./routes/UserRoute"));
-// app.use("/api/users", require("./routes/UserProfileRoute"));
-// app.use("/api/profiles", require("./routes/UserProfileRoute"));
-// app.use("/api/posts", require("./routes/PostRoute"));
-// app.use("/api/guidances", require("./routes/GuidanceRoute"));
-// app.use("/api/notifications", require("./routes/NotificationRoute"));
-// app.use("/api/feedbacks", require("./routes/FeedbackRoute"));
+app.use("/api/rooms", require("./routes/RoomRoute"));
+app.use("/api/bookings", require("./routes/BookingRoute"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

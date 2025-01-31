@@ -15,11 +15,14 @@ const corsOptions = {
     // maxAge: 3600, // Maximum age of the preflight request cache
 };
 app.use(cors(corsOptions));
-
+app.use("/uploads", express.static("public/uploads"));
 // Routes
-app.use("/api/users", require("./routes/UserRoute"));
+const userRoutes = require("./routes/UserRoute")
+app.use("/api/users", userRoutes);
 app.use("/api/rooms", require("./routes/RoomRoute"));
 app.use("/api/bookings", require("./routes/BookingRoute"));
+app.use("/api/otp", require("./routes/OptRoute"));
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

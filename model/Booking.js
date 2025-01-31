@@ -6,7 +6,7 @@ const bookingSchema = new mongoose.Schema(
         room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
         checkIn: { type: Date, required: true },
         checkOut: { type: Date, required: true },
-        confirmed: {type: Boolean, default: false},
+        confirmed: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

@@ -1,14 +1,45 @@
 const Room = require("../model/Room");
 
-// Create a Room
+// Create Room Handler with image upload
 const createRoom = async (req, res) => {
   try {
-    const room = await Room.create(req.body);
+    console.log("📩 Request Body:", req.body); // ✅ Print request body
+    console.log("📷 Uploaded File:", req.file); // ✅ Print uploaded image file (if any)
+
+    const { name, type, price, description, amenities } = req.body;
+
+    if (!name || !type || !price || !description || !amenities) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Convert amenities string to an array
+    const amenitiesArray = amenities.split(",");
+
+    // Handle single image upload (Fix potential file upload issue)
+    let imagePath = req.file ? req.file.path : null;
+    console.log("🖼 Image Path:", imagePath); // ✅ Print Image Path
+
+    // Create the room in the database
+    const room = await Room.create({
+      name,
+      type,
+      price,
+      description,
+      amenities: amenitiesArray,
+      images: imagePath ? [imagePath] : [], // Store as an array
+    });
+
     res.status(201).json(room);
   } catch (error) {
-    res.status(500).json({ message: "Failed to create room", error: error.message });
+    console.error("❌ Error adding room:", error); // ✅ Print error if any
+    res.status(500).json({ message: "Error adding room", error: error.message });
   }
 };
+
+
+
+// Other Handlers remain the same (getAllRooms, getRoomById, updateRoomAvailability, deleteRoom)
+
 
 // Get All Rooms
 const getAllRooms = async (req, res) => {

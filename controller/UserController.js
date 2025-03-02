@@ -9,10 +9,11 @@ require("dotenv").config();
 // Generate OTP function
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
-// ----------------------------
-// User Registration with OTP
-// ----------------------------
+
+
 const registerUser = async (req, res) => {
+    console.log("📩 Request Body:", req.body); // ✅ Print request body
+    console.log("📷 Uploaded File:", req.file); // ✅ Print uploaded image file (if any)
     try {
         const { fullname, address, phone, email, password } = req.body;
 
@@ -31,6 +32,7 @@ const registerUser = async (req, res) => {
 
         // Handle image upload (optional)
         let imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+        console.log("🖼 Image Path:", imagePath); // ✅ Print Image Path
 
         // Create new user
         user = new User({
@@ -52,9 +54,11 @@ const registerUser = async (req, res) => {
 
         res.status(200).json({ message: "OTP sent to email. Please verify." });
     } catch (err) {
+        console.error("❌ Error registering user:", err); // ✅ Print error if any
         res.status(500).json({ message: "Error registering user", error: err.message });
     }
 };
+
 
 const verifyOTP = async (req, res) => {
     try {
@@ -103,6 +107,27 @@ const resendOTP = async (req, res) => {
 };
 
 // Login User
+// const loginUser = async (req, res) => {
+//     try {
+//         const { email, password } = req.body;
+
+//         const user = await User.findOne({ email });
+//         if (!user || !await bcrypt.compare(password, user.password)) {
+//             return res.status(400).json({ message: "Invalid email or password" });
+//         }
+
+//         if (!user.isVerified) {
+//             return res.status(400).json({ message: "Please verify your email first." });
+//         }
+
+//         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+//         res.status(200).json({ message: "Login successful", token });
+//     } catch (err) {
+//         res.status(500).json({ message: "Error logging in", error: err.message });
+//     }
+// };
+
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -116,13 +141,18 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ message: "Please verify your email first." });
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-        res.status(200).json({ message: "Login successful", token });
+        res.status(200).json({
+            message: "Login successful",
+            token,
+            role: user.role, // Send role in response
+        });
     } catch (err) {
         res.status(500).json({ message: "Error logging in", error: err.message });
     }
 };
+
 
 // Get All Users
 const getAllUsers = async (req, res) => {
@@ -138,7 +168,9 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user) res.json(user);
-    else res.status(404).json({ message: "User not found" });
+    else res.status(404).json({
+        message: "User not found"
+    });
 };
 
 // Delete User
@@ -148,5 +180,34 @@ const deleteUser = async (req, res) => {
     else res.status(404).json({ message: "User not found" });
 };
 
+const getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch user profile", error: error.message });
+    }
+};
 
-module.exports = { registerUser, loginUser, getAllUsers, getUserById, deleteUser, verifyOTP, resendOTP };
+const updateProfilePic = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.image = req.file ? `/uploads/${req.file.filename}` : user.image;
+        await user.save();
+
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update profile picture", error: error.message });
+    }
+};
+
+
+
+module.exports = { registerUser, loginUser, getAllUsers, getUserById, deleteUser, verifyOTP, resendOTP, getUserProfile, updateProfilePic };

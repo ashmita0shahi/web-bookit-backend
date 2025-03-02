@@ -7,6 +7,7 @@ const {
     updateRoomAvailability,
     deleteRoom,
 } = require("../controller/RoomController");
+const { uploadsingle } = require("../middleware/uploads");
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get("/", getAllRooms); // Get all rooms
 router.get("/:id", getRoomById); // Get room by ID
 
 // Staff Routes
-router.post("/", protect, staff, createRoom); // Create a new room
+router.post("/", protect, staff, uploadsingle, createRoom); // Create a new room
 router.put("/:id/status", protect, staff, updateRoomAvailability); // Update room availability
 router.delete("/:id", protect, staff, deleteRoom); // Delete a room
 

@@ -7,6 +7,9 @@ connectDB();
 
 const app = express();
 app.use(express.json());
+
+app.use('/public', express.static('public'));
+
 const corsOptions = {
     origin: ["http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -21,7 +24,6 @@ const userRoutes = require("./routes/UserRoute")
 app.use("/api/users", userRoutes);
 app.use("/api/rooms", require("./routes/RoomRoute"));
 app.use("/api/bookings", require("./routes/BookingRoute"));
-app.use("/api/otp", require("./routes/OptRoute"));
 
 
 const PORT = process.env.PORT || 3000;
